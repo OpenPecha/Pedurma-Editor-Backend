@@ -13,8 +13,13 @@ class Text(BaseModel):
     title: str
 
 
-class Page(BaseModel):
+class PageRead(BaseModel):
+    id: str
     image_url: HttpUrl
+    content: str
+
+
+class PageWrite(BaseModel):
     content: str
 
 
@@ -42,7 +47,7 @@ def get_page_list(pecha: str, text_id: str) -> list[str]:
 
 
 @app.get("/{pecha}/{text_id}/{page_id}")
-def read_page(pecha: str, text_id: str, page_id: str) -> Page:
+def read_page(pecha: str, text_id: str, page_id: str) -> PageRead:
     pecha_path = config.DATA_PATH / pecha
     text_path = pecha_path / text_id
     page_content_fn = text_path / f"{page_id}.txt"
@@ -50,4 +55,13 @@ def read_page(pecha: str, text_id: str, page_id: str) -> Page:
     page_image_url = page_img_fn.read_text().strip()
     page_content = page_content_fn.read_text().strip()
 
-    return Page(image_url=page_image_url, content=page_content)
+    return PageRead(id=page_id, image_url=page_image_url, content=page_content)
+
+
+@app.post("/{pecha}/{text_id}/{page_id}")
+def write_page(pecha: str, text_id: str, page_id: str, page: PageWrite):
+    pecha_path = config.DATA_PATH / pecha
+    text_path = pecha_path / text_id
+    page_content_fn = text_path / f"{page_id}.txt"
+    page_content_fn.write_text(page.content)
+    return {"message": "success"}
