@@ -1,24 +1,39 @@
 import json
 
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, HttpUrl
 
 import config
 
 app = FastAPI()
 
 
+class Text(BaseModel):
+    id: str
+    title: str
+
+
+class Page(BaseModel):
+    image_url: HttpUrl
+    content: str
+
+
 @app.get("/{pecha}/texts")
-def get_text_list(pecha: str):
+def get_text_list(pecha: str) -> list[Text]:
     pecha_path = config.DATA_PATH / pecha
     toc_fn = pecha_path / "toc.json"
     if not pecha_path.exists() or not toc_fn.exists():
         return HTTPException(status_code=404, detail="pecha not found")
     toc_fn = pecha_path / "toc.json"
-    return json.load(toc_fn.open("r"))
+    toc_dict = json.load(toc_fn.open("r"))
+    text_list = []
+    for text_id, text_title in toc_dict.items():
+        text_list.append(Text(id=text_id, title=text_title))
+    return text_list
 
 
 @app.get("/{pecha}/{text_id}/pages")
-def get_page_list(pecha: str, text_id: str):
+def get_page_list(pecha: str, text_id: str) -> list[str]:
     pecha_path = config.DATA_PATH / pecha
     text_path = pecha_path / text_id
     if not text_path.exists():
@@ -27,13 +42,12 @@ def get_page_list(pecha: str, text_id: str):
 
 
 @app.get("/{pecha}/{text_id}/{page_id}")
-def read_page(pecha: str, text_id: str, page_id: str):
+def read_page(pecha: str, text_id: str, page_id: str) -> Page:
     pecha_path = config.DATA_PATH / pecha
     text_path = pecha_path / text_id
     page_content_fn = text_path / f"{page_id}.txt"
     page_img_fn = text_path / f"{page_id}.img"
+    page_image_url = page_img_fn.read_text().strip()
+    page_content = page_content_fn.read_text().strip()
 
-    return {
-        "image_url": page_img_fn.read_text().strip(),
-        "content": page_content_fn.read_text().strip(),
-    }
+    return Page(image_url=page_image_url, content=page_content)
