@@ -8,7 +8,7 @@ import config
 
 app = FastAPI()
 
-origins = ["http://localhost:9000"]
+origins = ["http://localhost:9000", "https://pedurma-editor.onrender.com"]
 
 app.add_middleware(
     CORSMiddleware,
