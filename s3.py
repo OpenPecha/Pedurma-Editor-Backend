@@ -2,7 +2,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 
 
-def create_presigned_url(bucket_name, object_name, expiration=3600):
+def create_s3_presigned_url(bucket_name, object_name, expiration=3600):
     """
     Generate a presigned URL to share an S3 object
 
@@ -26,14 +26,19 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
     return presigned_url
 
 
-# Example usage
-object_name = "W1PD95844/I1PD95846/I1PD958461520.jpg"
-bucket_name = "pedurma"  # Specify your S3 bucket name
-expiration = 600  # Presigned URL expiry time in seconds
+def get_pedurma_image_url(image_name):
+    return create_s3_presigned_url(bucket_name="pedurma", object_name=image_name)
 
-# Generate a presigned URL
-url = create_presigned_url(bucket_name, object_name, expiration)
-if url:
-    print(f"Presigned URL: {url}")
-else:
-    print("Failed to generate presigned URL.")
+
+if __name__ == "__main__":
+    # Example usage
+    object_name = "W1PD95844/I1PD95846/I1PD958461520.jpg"
+    bucket_name = "pedurma"  # Specify your S3 bucket name
+    expiration = 600  # Presigned URL expiry time in seconds
+
+    # Generate a presigned URL
+    url = create_s3_presigned_url(bucket_name, object_name, expiration)
+    if url:
+        print(f"Presigned URL: {url}")
+    else:
+        print("Failed to generate presigned URL.")

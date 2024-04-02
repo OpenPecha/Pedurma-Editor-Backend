@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 
 import config
+from s3 import get_pedurma_image_url
 
 app = FastAPI()
 
@@ -63,7 +64,8 @@ def read_page(pecha: str, text_id: str, page_id: str) -> PageRead:
     text_path = pecha_path / text_id
     page_content_fn = text_path / f"{page_id}.txt"
     page_img_fn = text_path / f"{page_id}.img"
-    page_image_url = page_img_fn.read_text().strip()
+    page_image_name = page_img_fn.read_text().strip()
+    page_image_url = get_pedurma_image_url(page_image_name)
     page_content = page_content_fn.read_text().strip()
 
     return PageRead(id=page_id, image_url=page_image_url, content=page_content)
