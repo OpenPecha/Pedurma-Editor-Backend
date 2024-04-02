@@ -1,10 +1,13 @@
 import argparse
+import os
 from pathlib import Path
 
 import boto3
 from botocore.exceptions import NoCredentialsError
 
 DATA_PATH = Path(__file__).parent.parent / "data"
+
+os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "~/.aws/op_credentials"
 
 
 import boto3
