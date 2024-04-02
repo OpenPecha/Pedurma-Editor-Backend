@@ -69,7 +69,7 @@ def upload_images(images_path: Path, pecha: str, volume_name: str):
         if int(image_num) < 3:
             continue
         print(f"[INFO] uploading {pecha}/{volume_name}/{image_num}")
-        s3_object_name = f"{pecha}/{volume_name}/{image_num}.{image_fn.suffix}"
+        s3_object_name = f"{pecha}/{volume_name}/{image_num}{image_fn.suffix}"
         upload_to_s3(str(image_fn), "pedurma", object_name=s3_object_name)
 
 
